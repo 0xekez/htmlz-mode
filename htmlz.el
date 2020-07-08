@@ -1,17 +1,11 @@
-;; Things to think about:
+;; htmlz-mode
 ;;
-;;  1. This currently does not render images correctly as the base
-;;     directoy changes for the html file. Stylesheets are the same
-;;     deal. This is clearly no good.
-;;  2. Currently our script tag that we insert injects html in to the
-;;     document body, but does not replace the html on the page as
-;;     this would likely cause it to replace itself. I am not sure
-;;     that it replacing itself is actually a problem though as long
-;;     as it runs once and sets up the websocket.
-;;
-;; Likely to solve these problems we will have to create a temporary
-;; file in the same directory as the buffer's file and then load the
-;; buffer contents in.
+;; An Emacs mode that gives a live preview while you edit html. There
+;; are other programs that do this and they are reasonably good I'm
+;; sure, but they all seem a little more complicated than I'd actually
+;; like. This doesn't have any shortcuts or really add anything other
+;; than a live preview that starts if you run M-x htmlz-mode from a
+;; buffer.
 
 (defun require-package (package)
   "Install given PACKAGE if it was not installed before."
@@ -35,6 +29,15 @@
   "The current websocket server. Created after the client opens a
   websocket connection with us.")
 
+(defun htmlz-get-current-extension ()
+  (car (reverse (split-string (buffer-file-name) "\\."))))
+
+(defun htmlz-get-current-dir ()
+  (file-name-directory (buffer-file-name)))
+
+(defun htmlz-get-filename ()
+  (concat (htmlz-get-current-dir) "~htmlz-tmp." (htmlz-get-current-extension)))
+
 (defun htmlz-init-file ()
   "Creates a file which htmlz loads. The file contains javascript
 which can communicate with our websockets server."
@@ -42,13 +45,18 @@ which can communicate with our websockets server."
 <script>
 const ws = new WebSocket('ws://localhost:3000')
 ws.onmessage = function(event) {
+// This method, while more pendatic, is much slower.
+// document.open()
+// document.write(event.data)
+// document.close()
 document.body.innerHTML = event.data;
 }
 </script>"
-		nil "/tmp/.emacs-http-server.html"
+		nil (htmlz-get-filename)
 		nil 'quiet))
+
 (defun htmlz-open-file ()
-  (browse-url "/tmp/.emacs-http-server.html"))
+  (browse-url (htmlz-get-filename)))
 
 (defun htmlz-init-server ()
   (interactive)
@@ -80,6 +88,7 @@ document.body.innerHTML = event.data;
 
 (defun htmlz-finish ()
   (htmlz-close-server)
+  (delete-file (htmlz-get-filename))
   (remove-hook 'post-command-hook 'htmlz-send-buffer-contents 'local))
 
 (define-minor-mode htmlz-mode

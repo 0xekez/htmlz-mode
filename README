@@ -20,12 +20,7 @@ It basically works like this:
 This is my first Emacs Lisp program ever so it's likely to do some
 things in a less-than-ideal way.
 
-There are a couple things it does not support:
-
-1. Editing associated CSS/JS files in emacs will not cause the preview
-   to update.
-2. Relative paths do not work becuase the temporary file it creates
-   lives in `/tmp/`.
-   
-I intend to fix those problems soon as they are must have features in
-order for this to be useful to me.
+At the moment, this does not support refreshing when associated files
+(think css files) are edited. Adding this likely wouldn't be too
+difficult as we could just parse the first html document whenver a new
+buffer was opened and updated some sort of "dependency tree".
