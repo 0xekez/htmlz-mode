@@ -1,10 +1,10 @@
-;;; htmlz --- Simple real-time Emacs html preview
+;;; htmlz-mode --- Simple real-time Emacs html preview
 
 ;; Copyright (C) 2020 Zeke Medley
 
 ;; Author: Zeke Medley <zekemedley@gmail.com>
 ;; Keywords: html
-;; Version: 0.1
+;; Version: 0.2
 ;; URL: https://github.com/ZekeMedley/htmlz
 
 ;;; Commentary:
@@ -106,6 +106,7 @@ document.body.innerHTML = event.data;
   (delete-file (htmlz-get-filename))
   (remove-hook 'post-command-hook 'htmlz-send-buffer-contents 'local))
 
+;;;###autoload
 (define-minor-mode htmlz-mode
   "The htmlz minor mode"
   :lighter " htmlz"
@@ -117,4 +118,4 @@ document.body.innerHTML = event.data;
     (htmlz-start)))
 
 (provide 'htmlz-mode)
-;;; htmlz.el ends here
+;;; htmlz-mode.el ends here
